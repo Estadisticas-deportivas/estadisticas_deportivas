@@ -1,33 +1,44 @@
 #Código que calcula el ranking por equipos,
-#promedio de goles por partido y tabla de posiciones
-#los resultados se generarán en archivos .txt y se guardarán
+#promedio de goles por partido y tabla de posiciones.
+#Los resultados se generarán en archivos .txt y se guardarán
 #en la carpeta "resultados"
 
-import pandas as pd
-import os
+
+import pandas as pd # Librería para manejar archivos .csv
+import os 
 
 # ==========================================
 # 1. RANKING DE VICTORIAS
 # ==========================================
 def analizar_partidos():
+    """
+    Lee los datos del archivo CSV de partidos, calcula las estadísticas
+    de victorias, promedio de goles generales y genera la tabla de posiciones.
+
+    Devuelve:
+        diccionario de victorias, el promedio de goles y diccionario puntos de equipos 
+        si la lectura es exitosa.
+        (None, None, None) si ocurre algún error de E/S o de formato.
+    """
     ruta = os.path.join("../datos", "ARG.csv")
     #ruta = os.path.join("ARG.csv")
 
     try:
+        # Carga del dataset original
         df = pd.read_csv(ruta) 
-        # Seleccionamos las columnas por índice (6, 7, 8, 9, 10)
-        # En Python el índice empieza en 0. 
+        # Extracción de columnas críticas mediante indexación numérica (.iloc)
+        # Nota de QA: Índices mapeados en base 0 (Columnas 6 a 10 del archivo real)
         equipos_local = df.iloc[:, 5]
         equipos_visita = df.iloc[:, 6]
         goles_local = df.iloc[:, 7]
         goles_visita = df.iloc[:, 8]
         resultados = df.iloc[:, 9]
 
-        #calulamos las victorias
-        # Filtramos donde el resultado fue 'H' (Home/Local) y contamos cuántas veces aparece cada equipo
+        # ===========================================
+        # 1. RANKING DE VICTORIAS
+        # ===========================================
+        # Frecuencia de victorias locales ('H' - Home) y visitantes ('A' - Away)
         ganados_local = equipos_local[resultados == 'H'].value_counts()
-
-        # Filtramos donde el resultado fue 'A' (Away/Visitante)
         ganados_visita = equipos_visita[resultados == 'A'].value_counts()
 
         # Sumamos ambos resultados para tener el total de victorias por equipo
@@ -101,6 +112,7 @@ def mostrar_tabla_posiciones(puntos_dict):
 # FUNCIONES PARA GUARDAR EN ARCHIVOS
 # ==========================================
 def guardar_ranking(diccionario, carpeta):
+    # Genera el reporte txt del ranking de victorias
     ruta_archivo = os.path.join(carpeta, "ranking_victorias.txt")
     
     with open(ruta_archivo, "w", encoding="utf-8") as f:
@@ -113,6 +125,7 @@ def guardar_ranking(diccionario, carpeta):
             f.write(f"{equipo:<25} | {ganados}\n")
 
 def guardar_estadisticas(promedio_goles, carpeta):
+  # Genera el reporte txt de la liga por promedio de goles.
     ruta_archivo = os.path.join(carpeta, "estadisticas_generales.txt")
     
     with open(ruta_archivo, "w", encoding="utf-8") as f:
@@ -120,6 +133,7 @@ def guardar_estadisticas(promedio_goles, carpeta):
         f.write(f"Promedio de goles por partido: {promedio_goles:.2f}\n")
 
 def guardar_tabla_posiciones(puntos_dict, carpeta):
+    # Genera el reporte txt de la liga ordenado por puntos.
     ruta_archivo = os.path.join(carpeta, "tabla_posiciones.txt")
     
     with open(ruta_archivo, "w", encoding="utf-8") as f:
@@ -131,9 +145,8 @@ def guardar_tabla_posiciones(puntos_dict, carpeta):
         for i, (equipo, puntos) in enumerate(tabla_ordenada, start=1):
             f.write(f"{i:<4} | {equipo:<25} | {puntos}\n")
 
-
-# Evita que el código se corra al ser importado
-if __name__ == "__main__":
+# Bloque de ejecución principal
+if __name__ == "__main__": # Evita que el código se corra al ser importado
     # Definimos la carpeta de destino
     carpeta_resultados = "../resultados"
     

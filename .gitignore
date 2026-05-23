@@ -1,2 +1,4 @@
 config.txt
-__pycache__/
+_pycache_/
+*.txt
+resultados/
